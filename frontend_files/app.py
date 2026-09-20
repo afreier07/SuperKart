@@ -1,6 +1,7 @@
 
 import streamlit as st
 import requests
+import pandas as pd
 
 st.set_page_config(
     page_title="SuperKart Sales Prediction",
@@ -105,3 +106,46 @@ if st.button("Predict Sales"):
 
     except requests.exceptions.RequestException as e:
         st.error(f"Could not connect to backend: {e}")
+
+st.divider()
+st.subheader("Batch Prediction")
+
+uploaded_file = st.file_uploader(
+    "Upload a CSV file for batch prediction",
+    type=["csv"]
+)
+
+if uploaded_file is not None:
+    batch_data = pd.read_csv(uploaded_file)
+
+    st.write("Uploaded data:")
+    st.dataframe(batch_data)
+
+    if st.button("Predict Batch"):
+        try:
+            response = requests.post(
+                "http://superkart-backend:5000/predict_batch",
+                json=batch_data.to_dict(orient="records")
+            )
+
+            if response.status_code == 200:
+                predictions = response.json()["predictions"]
+
+                result = batch_data.copy()
+                result["Predicted_Sales"] = predictions
+
+                st.success("Batch prediction completed.")
+                st.dataframe(result)
+
+                st.download_button(
+                    "Download Predictions",
+                    data=result.to_csv(index=False).encode("utf-8"),
+                    file_name="SuperKart_Batch_Predictions.csv",
+                    mime="text/csv"
+                )
+
+            else:
+                st.error(f"Batch prediction failed: {response.text}")
+
+        except requests.exceptions.RequestException as e:
+            st.error(f"Could not connect to backend: {e}")

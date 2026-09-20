@@ -53,6 +53,24 @@ def predict():
             "error": str(e)
         }), 400
 
+@app.route("/predict_batch", methods=["POST"])
+def predict_batch():
+    try:
+        data = request.get_json()
+
+        input_data = pd.DataFrame(data)
+        input_data = input_data[FEATURES]
+
+        predictions = model.predict(input_data)
+
+        return jsonify({
+            "predictions": [float(prediction) for prediction in predictions]
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 400
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
