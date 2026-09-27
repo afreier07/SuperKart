@@ -1,0 +1,15 @@
+{
+  "portsAttributes": {
+    "5000": {
+      "label": "SuperKart Backend",
+      "onAutoForward": "openPreview",
+      "visibility": "public"
+    },
+    "8501": {
+      "label": "SuperKart Frontend",
+      "onAutoForward": "openPreview",
+      "visibility": "public"
+    }
+  },
+  "forwardPorts": [5000, 8501]
+}
